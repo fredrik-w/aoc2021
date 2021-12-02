@@ -17,19 +17,14 @@ export const part1 = (lines: string[]): number => {
 };
 
 export const part2 = (lines: string[]): number => {
-  return -1;
+  const products = {x: 0, y: 0, z: 0};
+  lines.forEach((v) => {
+    const [command, value] = v.split(' ');
+    products.x += command !== 'forward' ? 0 : parseInt(value);
+    products.y += command !== 'forward' ? 0 : products.z * parseInt(value);
+    products.z += command === 'forward' ? 0 : parseInt(value) * (command === 'up' ? -1 : 1);
+  });
+  return products.x * products.y;
 }
 
-const part = process.env.part || 'part1';
-const numbers = readFile('input.txt');
-
-
-if (require.main === module) {
-  let result: unknown;
-  if (part === 'part1') {
-    result = part1(numbers);
-  } else {
-    result = part2(numbers)
-  }
-  console.log(result);
-}
+require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
