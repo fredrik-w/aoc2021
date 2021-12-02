@@ -1,10 +1,6 @@
 import * as fs from 'fs';
 
-export const readFile = (filename: string) => fs
-  .readFileSync(filename)
-  .toString()
-  .trim()
-  .split('\n');
+export const readFile = (filename: string) => fs.readFileSync(filename).toString().trim().split('\n');
 
 export const part1 = (lines: string[]): number => {
   const products = {x: 0, y: 0};
