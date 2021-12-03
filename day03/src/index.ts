@@ -19,18 +19,17 @@ export const part1 = (lines: string[]): number => {
   return parseInt(gamma, 2) * parseInt(epsilon, 2);
 };
 
-const part2Filter = (bits: number[][], filter: (x: number, y: number) => number) => {
-  let filteredData: number[][] = bits;
-  for (let i = 0; i < bits[0].length && filteredData.length > 1; i++) {
-    filteredData = filteredData.filter((v) => v[i] === filter(occurrences(filteredData)[i], filteredData.length));
-  }
-  return filteredData[0];
-}
-
 export const part2 = (lines: string[]): number => {
+  const filter = (bits: number[][], condition: (x: number, y: number) => number) => {
+    let filteredData: number[][] = bits;
+    for (let i = 0; i < bits[0].length && filteredData.length > 1; i++) {
+      filteredData = filteredData.filter((v) => v[i] === condition(occurrences(filteredData)[i], filteredData.length));
+    }
+    return filteredData[0];
+  }
   const bits = toBitList(lines);
-  const oxygen = part2Filter(bits, (x, y) => x >= y / 2 ? 1 : 0);
-  const scrubber = part2Filter(bits, (x, y) => x < y / 2 ? 1 : 0);
+  const oxygen = filter(bits, (x, y) => x >= y / 2 ? 1 : 0);
+  const scrubber = filter(bits, (x, y) => x < y / 2 ? 1 : 0);
 
   return parseInt(oxygen.join(''), 2) * parseInt(scrubber.join(''), 2);
 }
