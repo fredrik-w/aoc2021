@@ -1,0 +1,12 @@
+# Editor files
+.idea/
+
+# Output directories
+**/build/
+
+# Dependencies
+**/node_modules
+
+# misc
+.nvmrc
+
