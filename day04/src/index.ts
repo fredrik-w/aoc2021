@@ -56,7 +56,22 @@ export const part1 = (lines: string[]): number => {
 }
 
 export const part2 = (lines: string[]): number => {
-  return -1;
+  let {numbers, boards} = getNumbersAndBoards(lines);
+  let winningBoards: number[] = [];
+  let lastNumber: number = 0;
+  numbers.every(n => {
+    markNumber(boards, n);
+    for (let i = 0; i < boards.length; i++) {
+      if (!winningBoards.includes(i) && boardHasWon(boards[i])) {
+        winningBoards.push(i);
+      }
+    }
+    lastNumber = parseInt(n);
+    return winningBoards.length !== boards.length;
+  });
+  const looser = boards.filter((v, idx) => idx === winningBoards[winningBoards.length-1])[0];
+  const unchecked = looser.flatMap(line => line.filter(square => square[1] === 0).flatMap(square => square[0])).map(v => parseInt(v as string)).reduce((sum, v) => sum + v);
+  return unchecked * lastNumber;
 }
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
