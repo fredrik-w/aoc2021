@@ -10,6 +10,6 @@ describe('day05', () => {
 
   it('part2 should be correct', () => {
     expect(part2(readFile('example-input.txt'))).to.equal(12);
-    expect(part2(readFile('input.txt'))).to.equal(-1);
+    expect(part2(readFile('input.txt'))).to.equal(16793);
   })
 });
