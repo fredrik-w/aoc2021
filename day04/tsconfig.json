@@ -1,1 +1,20 @@
-../tsconfig.json
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2021",
+    "preserveConstEnums": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": false,
+    "rootDir": "src",
+    "types": [
+      "node",
+      "mocha",
+      "chai"
+    ],
+    "outDir": "build"
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
