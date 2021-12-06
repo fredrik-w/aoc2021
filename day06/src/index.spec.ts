@@ -9,7 +9,7 @@ describe('day06', () => {
   })
 
   it('part2 should be correct', () => {
-    expect(part2(readFile('example-input.txt'))).to.equal(-1);
-    expect(part2(readFile('input.txt'))).to.equal(-1);
+    expect(part2(readFile('example-input.txt'))).to.equal(26984457539);
+    expect(part2(readFile('input.txt'))).to.equal(1738377086345);
   })
 });
