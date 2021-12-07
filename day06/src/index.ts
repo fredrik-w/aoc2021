@@ -7,12 +7,8 @@ const lanternFishSimulator = (initial: number[], days: number): number => {
   initial.forEach(n => lanternFish[n]++);
 
   for (let day = 0; day < days; day++) {
-    let newFish: number = lanternFish[0];
-    for (let i = 0; i <= 7; i++) {
-      lanternFish[i] = lanternFish[i+1];
-    }
-    lanternFish[8] = newFish;
-    lanternFish[6] += newFish;
+    lanternFish.push(lanternFish.shift() as number);
+    lanternFish[6] += lanternFish[8];
   }
   return lanternFish.reduce((sum, v) => sum + v);
 }
