@@ -3,21 +3,18 @@ import fs from 'fs';
 export const readFile = (filename: string) => fs.readFileSync(filename).toString().trim().split(',').map(v => +v);
 
 const lanternFishSimulator = (initial: number[], days: number): number => {
-  let lanternFish: Map<number, number> = new Map<number, number>();
-  for (let i = 0; i <= 8; i++) {
-    lanternFish.set(i, 0);
-  }
-  initial.forEach(n => lanternFish.set(n, lanternFish.get(n) as number + 1));
+  let lanternFish: number[] = new Array(9).fill(0);
+  initial.forEach(n => lanternFish[n]++);
 
   for (let day = 0; day < days; day++) {
-    let newFish: number = lanternFish.get(0) as number;
+    let newFish: number = lanternFish[0];
     for (let i = 0; i <= 7; i++) {
-      lanternFish.set(i, +(lanternFish.get(i + 1) as number));
+      lanternFish[i] = lanternFish[i+1];
     }
-    lanternFish.set(8, newFish);
-    lanternFish.set(6, (lanternFish.get(6) as number) + newFish);
+    lanternFish[8] = newFish;
+    lanternFish[6] += newFish;
   }
-  return [...lanternFish.values()].reduce((sum, v) => sum + v);
+  return lanternFish.reduce((sum, v) => sum + v);
 }
 
 export const part1 = (initial: number[]): number => {
