@@ -1,6 +1,8 @@
 # Editor files
 .idea/
 
+*.js
+
 # Output directories
 **/build/
 
