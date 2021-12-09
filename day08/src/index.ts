@@ -28,7 +28,7 @@ const mapWiresToDigits = (wires: string[]) => {
   map[9] = containsAll(filterByLength(wires, 6), map[4].split(''));
   map[0] = containsAll(filterByLength(wires, 6).filter(w => w !== map[9]), map[1].split(''));
   map = map.map(d => sortString(d));
-  map[6] = wires.filter(w => !map.includes(sortString(w)))[0];
+  map[6] = sortString(wires.filter(w => !map.includes(sortString(w)))[0]);
   return map;
 }
 
