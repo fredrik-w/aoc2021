@@ -17,8 +17,6 @@ const getAdjacent = (map: number[][], row: number, col: number): Array<number[]>
 
 const includes = (collection: number[][], value: number[]): boolean => collection.find(([x, y]) => value[0] === x && value[1] === y) !== undefined;
 
-const visualize = (map: number[][]): void => map.forEach(line => console.log(line.join('')));
-
 const simulate = (map: number[][], steps: number, breakOnAllFlashes: boolean=false): number => {
   let flashes: number = 0;
   for (let i = 0; i < steps; i++) {
@@ -30,10 +28,8 @@ const simulate = (map: number[][], steps: number, breakOnAllFlashes: boolean=fal
           let [x, y] = inspect.shift()!;
           if (!includes(flashed, [x, y])) {
             if (++map[x][y] > 9) {
-              flashes++;
-              flashed.push([x, y]);
-              map[x][y] = 0;
-              inspect.push(...getAdjacent(map, x, y));
+              flashed.push([x, y]) && flashes++;
+              inspect.push(...getAdjacent(map, x, y)) && (map[x][y] = 0);
             }
           }
         }
