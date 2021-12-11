@@ -13,12 +13,9 @@ const lanternFishSimulator = (initial: number[], days: number): number => {
   return lanternFish.reduce((sum, v) => sum + v);
 }
 
-export const part1 = (initial: number[]): number => {
-  return lanternFishSimulator(initial, 80);
-}
+export const part1 = (initial: number[]): number => lanternFishSimulator(initial, 80);
 
-export const part2 = (initial: number[]): number => {
-  return lanternFishSimulator(initial, 256);
-}
+export const part2 = (initial: number[]): number => lanternFishSimulator(initial, 256);
+
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
