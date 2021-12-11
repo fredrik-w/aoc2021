@@ -29,9 +29,7 @@ export const part1 = (lines: string[]): number => {
 }
 
 const exploreBasin = (lines: string[], adjacent: Array<number[]>): Array<number[]> => {
-  const includes = (collection: Array<number[]>, value: number[]): boolean => {
-    return collection.find(([x, y]) => value[0] === x && value[1] === y) !== undefined;
-  }
+  const includes = (collection: Array<number[]>, value: number[]): boolean => collection.find(([x, y]) => value[0] === x && value[1] === y) !== undefined;
 
   let points: Array<number[]> = [];
   let inspect: Array<number[]> = adjacent;
@@ -39,8 +37,7 @@ const exploreBasin = (lines: string[], adjacent: Array<number[]>): Array<number[
     let [row, col] = inspect.pop()!;
     if (valueAt(lines, row, col) < 9) {
       !includes(points, [row,col]) && points.push([row, col]);
-      let newPoints = getAdjacent(lines, row, col).filter(point => !includes(points, point) && valueAt(lines, point[0], point[1]) < 9);
-      inspect.push(...newPoints);
+      inspect.push(...(getAdjacent(lines, row, col).filter(point => !includes(points, point) && valueAt(lines, point[0], point[1]) < 9)));
     }
   }
   return points;
@@ -51,15 +48,12 @@ export const part2 = (lines: string[]): number => {
 
   for (let row = 0; row < lines.length; row++) {
     for (let col = 0; col < lines[row].length; col++) {
-      let char = +lines[row].charAt(col);
       const adjacent = getAdjacent(lines, row, col);
-      if (isLowPoint(lines, char, adjacent)) {
-        basins.push(exploreBasin(lines, adjacent));
-      }
+      isLowPoint(lines, +lines[row].charAt(col), adjacent) && basins.push(exploreBasin(lines, adjacent));
     }
   }
-  basins.sort((a, b) => a.length > b.length ? 1 : -1);
-  return basins.slice(-3).map(basin => basin.length).reduce((sum, val) => sum * val);
+
+  return basins.sort((a, b) => a.length > b.length ? 1 : -1).slice(-3).map(basin => basin.length).reduce((sum, val) => sum * val);
 }
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
