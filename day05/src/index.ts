@@ -20,30 +20,27 @@ const createMap = (coordinates: Line[]): number[][] => {
 }
 
 const getPoints = function*(line: Line) {
-  let { start, end } = line;
-  for (let x=start.x, y=start.y;
-       ((start.x <= end.x && x <= end.x) || (start.x > end.x && x >= end.x)) && ((start.y <= end.y && y <= end.y) || (start.y > end.y && y >= end.y));
-       start.x !== end.x && (x += 1 * (start.x <= end.x ? 1 : -1)), start.y !== end.y && (y += 1 * (start.y <= end.y ? 1 : -1))) {
+  const { start, end } = line;
+  let { x, y } = start;
+  while (x !== end.x && y !== end.y) {
+    start.x !== end.x && (x += 1 * (start.x <= end.x ? 1 : -1))
+    start.y !== end.y && (y += 1 * (start.y <= end.y ? 1 : -1))
     yield [x, y];
   }
 }
 
 const calculate = (coordinates: Line[]): number => {
   let ventMap: number[][] = createMap(coordinates);
-  for (let line of coordinates) {
+  coordinates.forEach(line => {
     for (let [x, y] of getPoints(line)) {
       ventMap[y][x] += 1;
     }
-  }
+  });
   return ventMap.flat().filter(v => v > 1).length;
 }
 
-export const part1 = (input: Line[]): number => {
-  return calculate(input.filter(c => c.start.x === c.end.x || c.start.y === c.end.y));
-}
+export const part1 = (input: Line[]): number => calculate(input.filter(c => c.start.x === c.end.x || c.start.y === c.end.y));
 
-export const part2 = (coordinates: Line[]): number => {
-  return calculate(coordinates);
-}
+export const part2 = (coordinates: Line[]): number => calculate(coordinates);
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
