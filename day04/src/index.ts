@@ -9,26 +9,15 @@ class Board {
     this.marked = new Array(numbers.length).fill(0);
   }
 
-  public markNumber(number: string) {
+  public markNumber(number: string): void {
     const idx = this.numbers.findIndex(val => val === number);
     idx !== -1 && (this.marked[idx] = 1);
   }
 
-  public winningLine(line: number): boolean {
-    return this.marked[line] + this.marked[line + 1] + this.marked[line + 2] + this.marked[line + 3] + this.marked[line + 4] === 5;
-  }
-
-  public winningColumn(col: number): boolean {
-    return this.marked[col] + this.marked[col + 5] + this.marked[col + 10] + this.marked[col + 15] + this.marked[col + 20] === 5;
-  }
-
-  public hasWon(): boolean {
-    return this.winningLine(0) || this.winningLine(5) || this.winningLine(10) || this.winningLine(15) || this.winningLine(20) || this.winningColumn(0) || this.winningColumn(1) || this.winningColumn(2) || this.winningColumn(3) || this.winningColumn(4);
-  }
-
-  public sumOfUnchecked(): number {
-    return this.numbers.filter((v, idx) => this.marked[idx] === 0).map(s => parseInt(s)).reduce((sum, num) => sum + num, 0);
-  }
+  winningLine = (line: number): boolean => this.marked[line] + this.marked[line + 1] + this.marked[line + 2] + this.marked[line + 3] + this.marked[line + 4] === 5;
+  winningColumn = (col: number): boolean => this.marked[col] + this.marked[col + 5] + this.marked[col + 10] + this.marked[col + 15] + this.marked[col + 20] === 5;
+  hasWon = (): boolean => this.winningLine(0) || this.winningLine(5) || this.winningLine(10) || this.winningLine(15) || this.winningLine(20) || this.winningColumn(0) || this.winningColumn(1) || this.winningColumn(2) || this.winningColumn(3) || this.winningColumn(4);
+  sumOfUnchecked = (): number => this.numbers.filter((v, idx) => this.marked[idx] === 0).map(s => parseInt(s)).reduce((sum, num) => sum + num, 0);
 }
 
 const getNumbersAndBoards = (lines: string[]): { numbers: string[], boards: Board[] } => {
@@ -52,9 +41,7 @@ const drawAndMark = (lines: string[], breakCondition: (x: Array<unknown>, y: Arr
     for (let i = 0; i < boards.length; i++) {
       if (!winners.includes(boards[i])) {
         boards[i].markNumber(n);
-        if (boards[i].hasWon()) {
-          winners.push(boards[i]);
-        }
+        boards[i].hasWon() && winners.push(boards[i]);
       }
     }
     return breakCondition(winners, boards);
