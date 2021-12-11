@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-export const readFile = (filename: string) => fs.readFileSync(filename).toString().trim().split('\n');
+export const readFile = (filename: string) => fs.readFileSync(filename).toString().trim().split('\n').map(l => l.split('').map(s => +s));
 
 const getAdjacent = (map: number[][], row: number, col: number): Array<number[]> => {
   let adjacent: Array<number[]> = [];
@@ -19,12 +19,9 @@ const includes = (collection: number[][], value: number[]): boolean => collectio
 
 const visualize = (map: number[][]): void => map.forEach(line => console.log(line.join('')));
 
-export const part1 = (lines: string[]): number => {
-  const map: number[][] = lines.map(l => l.split('').map(s => +s));
-
+const simulate = (map: number[][], steps: number, breakOnAllFlashes: boolean=false): number => {
   let flashes: number = 0;
-
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < steps; i++) {
     let flashed: number[][] = [];
     for (let row = 0; row < map.length; row++) {
       for (let col = 0; col < map[0].length; col++) {
@@ -42,13 +39,20 @@ export const part1 = (lines: string[]): number => {
         }
       }
     }
+    if (breakOnAllFlashes && flashed.length === map.length * map[0].length) {
+      return i+1;
+    }
   }
   return flashes;
 }
 
+export const part1 = (map: number[][]): number => {
+  return simulate(map, 100);
+}
 
-export const part2 = (lines: string[]): number => {
-  return -1;
+
+export const part2 = (map: number[][]): number => {
+  return simulate(map, Infinity,true);
 }
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
