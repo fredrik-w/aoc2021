@@ -4,9 +4,7 @@ export const readFile = (filename: string) => fs.readFileSync(filename).toString
 
 export const part1 = (lines: string[]): number => {
   const products = {x: 0, y: 0};
-  lines.forEach((v) => v.startsWith('forward')
-    ? products.x += parseInt(v.split(' ')[1])
-    : products.y += parseInt(v.split(' ')[1]) * (v.startsWith('up') ? -1 : 1));
+  lines.forEach((v) => v.startsWith('forward') ? products.x += parseInt(v.split(' ')[1]) : products.y += parseInt(v.split(' ')[1]) * (v.startsWith('up') ? -1 : 1));
   return products.x * products.y;
 };
 
