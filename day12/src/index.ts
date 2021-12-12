@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-export const readFile = (filename: string) => fs.readFileSync(filename).toString().trim().split('\n');
+export const readFile = (filename: string) => fs.readFileSync(filename).toString().trim().split('\n').map(line => line.split('-'));
 
 const addPath = (collection: Map<string, string[]>, path: string[]): void => {
   !collection.has(path[0]) && collection.set(path[0], []);
@@ -11,33 +11,44 @@ const addPath = (collection: Map<string, string[]>, path: string[]): void => {
 
 const isSmallCave = (value: string): boolean => value === value.toLocaleLowerCase();
 
-const explore = (cave: Map<string, string[]>, visited: string[], current: string, routes: string[]): void => {
-  let paths = cave.get(current)!.filter(p => p !== 'start' && !(isSmallCave(p) && visited.includes(p)));// && (visited.length > 0 && p !== visited[visited.length-1]));
+const explore = (cave: Map<string, string[]>, visited: string[], current: string, routes: string[], doubleVisitOnce: boolean = false): void => {
+  let paths = cave.get(current)!.filter(p => p !== 'start');
   visited.push(current);
   if (current === 'end' || paths.length === 0) {
-    routes.push(visited.join(','));
+    current === 'end' && routes.push(visited.join(','));
     return;
   }
 
   for (let path of paths) {
-    if (path === visited[visited.length-1]) {
+    if (path === visited[visited.length - 1]) {
       continue;
     }
-    explore(cave, visited.slice(), path, routes);
+    if (isSmallCave(path) && visited.includes(path)) {
+      const small = visited.filter(p => isSmallCave(p));
+      if (!doubleVisitOnce || new Set(small).size !== small.length) {
+        continue;
+      }
+    }
+    explore(cave, visited.slice(), path, routes, doubleVisitOnce);
   }
+  return;
 }
 
-export const part1 = (lines: string[]): number => {
+const exploreCave = (paths: string[][], doubleVisitOnce: boolean): number => {
   const cave: Map<string, string[]> = new Map();
-  lines.map(line => line.split('-')).forEach(path => addPath(cave, path));
+  paths.forEach(path => addPath(cave, path));
   let routes: string[] = [];
-  explore(cave, [], 'start', routes);
-  return routes.filter(r => r.endsWith(',end')).length;
+  explore(cave, [], 'start', routes, doubleVisitOnce);
+  return routes.length;
+}
+
+export const part1 = (paths: string[][]): number => {
+  return exploreCave(paths, false);
 }
 
 
-export const part2 = (lines: string[]): number => {
-  return -1
+export const part2 = (paths: string[][]): number => {
+  return exploreCave(paths, true);
 }
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
