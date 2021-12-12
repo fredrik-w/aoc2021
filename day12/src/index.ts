@@ -11,12 +11,12 @@ const addPath = (collection: Map<string, string[]>, path: string[]): void => {
 
 const isSmallCave = (value: string): boolean => value === value.toLocaleLowerCase();
 
-const explore = (cave: Map<string, string[]>, visited: string[], current: string, routes: string[], doubleVisitOnce: boolean = false): void => {
+const explore = (cave: Map<string, string[]>, visited: string[], current: string, routes: string[], doubleVisitOnce: boolean = false): string[] => {
   let paths = cave.get(current)!.filter(p => p !== 'start');
   visited.push(current);
   if (current === 'end' || paths.length === 0) {
     current === 'end' && routes.push(visited.join(','));
-    return;
+    return routes;
   }
 
   for (let path of paths) {
@@ -31,24 +31,16 @@ const explore = (cave: Map<string, string[]>, visited: string[], current: string
     }
     explore(cave, visited.slice(), path, routes, doubleVisitOnce);
   }
-  return;
+  return routes;
 }
 
 const exploreCave = (paths: string[][], doubleVisitOnce: boolean): number => {
   const cave: Map<string, string[]> = new Map();
   paths.forEach(path => addPath(cave, path));
-  let routes: string[] = [];
-  explore(cave, [], 'start', routes, doubleVisitOnce);
-  return routes.length;
+  return explore(cave, [], 'start', [], doubleVisitOnce).length;
 }
 
-export const part1 = (paths: string[][]): number => {
-  return exploreCave(paths, false);
-}
-
-
-export const part2 = (paths: string[][]): number => {
-  return exploreCave(paths, true);
-}
+export const part1 = (paths: string[][]): number => exploreCave(paths, false);
+export const part2 = (paths: string[][]): number => exploreCave(paths, true);
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
