@@ -130,8 +130,6 @@ export const part2 = (lines: string[]): number => {
 
   const maxX = cave.maxX;
   const maxY = cave.maxY;
-  let adjustedMaxX = maxX;
-  let adjustedMaxY = maxY;
   let bigCave: number[][] = new Array(maxX*5).fill('0').map(_ => new Array(maxY*5).fill('0'));
   cave.getNodes().slice().forEach(n => {
     bigCave[n.x][n.y] = n.weight;
@@ -139,25 +137,7 @@ export const part2 = (lines: string[]): number => {
       for (let j=0; j<5; j++) {
         const xAdjustment = (maxX) * i;
         const yAdjustment = (maxY) * j;
-
-        const adjustedNode = new Node(n.x + xAdjustment, n.y + yAdjustment, calculateNewValue(n.weight, (i+j)));
-        bigCave[adjustedNode.x][adjustedNode.y] = adjustedNode.weight;
-        // adjustedNode.x > adjustedMaxX && (adjustedMaxX = adjustedNode.x);
-        // adjustedNode.y > adjustedMaxY && (adjustedMaxY = adjustedNode.y);
-
-        cave.addNode(adjustedNode);
-/*
-        for (let e of n.getEdges()) {
-          const adjustedEdge = new Node(e.x + xAdjustment, e.y + yAdjustment, calculateNewValue(e.weight, (i+j)));
-          cave.addNode(adjustedEdge);
-          cave.addEdge(adjustedNode, adjustedEdge)
-        }
-        if (xAdjustment % maxX === 0 || yAdjustment % maxY === 0) {
-//console.log(`even X (original node ${n.x},${n.y}), ${xAdjustment}, ${maxX}, adjusted node ${adjustedNode.x},${adjustedNode.y}`);
-//console.log(`even Y (original node ${n.x},${n.y}), ${xAdjustment}, ${maxX}, adjusted node ${adjustedNode.x},${adjustedNode.y}`);
-          n.addEdge(adjustedNode);
-        }
-        */
+        bigCave[n.x + xAdjustment][n.y + yAdjustment] = calculateNewValue(n.weight, (i+j));
       }
     }
   });
