@@ -10,7 +10,7 @@ describe('AoC 2021: day17', function () {
   });
 
   it('part2', () => {
-    expect(part2(readFile('input.example.txt')), 'part2: input.example.txt').to.equal(42);
-    expect(part2(readFile('input.txt')), 'part2: input.txt').to.equal(42);
+    expect(part2(readFile('input.example.txt')), 'part2: input.example.txt').to.equal(112);
+    expect(part2(readFile('input.txt')), 'part2: input.txt').to.equal(19);
   });
 });
