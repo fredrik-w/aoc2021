@@ -3,8 +3,6 @@ import {expect} from 'chai';
 import {hex2bin, part1, part2, readFile} from './index';
 
 describe('AoC 2021: day16', function () {
-  this.timeout(600000);
-
   it('hex2bin', () => {
       expect(hex2bin('8')).to.equal('1000');
       expect(hex2bin('F')).to.equal('1111');

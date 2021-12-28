@@ -88,16 +88,6 @@ const bitsCalculator = (packet: Packet): number => {
   }
 }
 
-const print = (packet: Packet, level: number = 0): void => {
-  let prefix = ' '.repeat(level);
-  if (packet.subPackets.length > 0) {
-    console.log(`${prefix}OperatorPacket[version ${packet.header.version}, typeId ${packet.header.typeId}, lengthTypeId ${packet.header.lengthTypeId}, #subPackets ${packet.subPackets.length}]`);
-    packet.subPackets.forEach(p => print(p, level + 1));
-  } else {
-    console.log(`${prefix}LiteralPacket[version ${packet.header.version}, typeId ${packet.header.typeId}, value ${packet.value}]`);
-  }
-}
-
 export const part1 = (input: string): number => {
   const packetVersions = (packet: Packet): number => packet.header.version + packet.subPackets.map(p => packetVersions(p)).reduce((sum, v) => sum + v, 0);
 
