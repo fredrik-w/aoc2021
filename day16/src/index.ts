@@ -24,7 +24,6 @@ class Packet {
 }
 
 const parse = (binary: string, position: number = 0): { packet: Packet, position: number } => {
-
   let packet: Packet|undefined;
 
   while (packet === undefined) {
@@ -32,14 +31,12 @@ const parse = (binary: string, position: number = 0): { packet: Packet, position
     position += 6;
     if (header.typeId === 4) {
       let values: string[] = [];
-      let chunk: string = '';
-
-      while (!(chunk = binary.substring(position, position + 5)).startsWith('0')) {
-        values.push(chunk);
-        position += 5;
+      while (position < binary.length) {
+        values.push(binary.substring(position, (position += 5)));
+        if (values[values.length - 1].startsWith('0')) {
+          break;
+        }
       }
-      values.push(chunk);
-      position += 5;
       packet = new Packet(header, bin2int(values.map(v => v.substring(1)).join('')));
     } else {
       position++;
@@ -68,11 +65,27 @@ const parse = (binary: string, position: number = 0): { packet: Packet, position
   return {packet: packet!, position}
 }
 
-const packetVersions = (packet: Packet): number => {
-  if (packet.subPackets.length > 0) {
-    return packet.header.version + packet.subPackets.map(p => packetVersions(p)).reduce((sum, v) => sum + v, 0);
+const bitsCalculator = (packet: Packet): number => {
+  switch (packet.header.typeId) {
+    case 0: // sum
+      return packet.subPackets.reduce((sum, p) => sum + bitsCalculator(p), 0);
+    case 1: // product
+      return packet.subPackets.reduce((sum, p) => sum * bitsCalculator(p), 1);
+    case 2: // minimum
+      return Math.min(...packet.subPackets.map(p => bitsCalculator(p)));
+    case 3: // maximum
+      return Math.max(...packet.subPackets.map(p => bitsCalculator(p)));
+    case 4: // literal value
+      return packet.value!;
+    case 5: // greater-than
+      return bitsCalculator(packet.subPackets[0]) > bitsCalculator(packet.subPackets[1]) ? 1 : 0;
+    case 6: // less-than
+      return bitsCalculator(packet.subPackets[0]) < bitsCalculator(packet.subPackets[1]) ? 1 : 0;
+    case 7: // less-than
+      return bitsCalculator(packet.subPackets[0]) === bitsCalculator(packet.subPackets[1]) ? 1 : 0;
+    default:
+      throw new Error('Illegal state');
   }
-  return packet.header.version;
 }
 
 const print = (packet: Packet, level: number = 0): void => {
@@ -86,13 +99,16 @@ const print = (packet: Packet, level: number = 0): void => {
 }
 
 export const part1 = (input: string): number => {
+  const packetVersions = (packet: Packet): number => packet.header.version + packet.subPackets.map(p => packetVersions(p)).reduce((sum, v) => sum + v, 0);
+
   const { packet, } = parse(hex2bin(input));
   return packetVersions(packet);
 };
 
 
 export const part2 = (input: string): number => {
-  return -1;
+  const { packet, } = parse(hex2bin(input));
+  return bitsCalculator(packet);
 }
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));

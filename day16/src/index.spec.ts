@@ -30,7 +30,18 @@ describe('AoC 2021: day16', function () {
     expect(part1(readFile('input.txt')), 'part1: input.txt').to.equal(875);
   });
 
+  it('part2 examples', () => {
+    expect(part2('C200B40A82'), 'part1: C200B40A82').to.equal(3);
+    expect(part2('04005AC33890'), 'part1: 04005AC33890').to.equal(54);
+    expect(part2('880086C3E88112'), 'part1: 880086C3E88112').to.equal(7);
+    expect(part2('CE00C43D881120'), 'part1: CE00C43D881120').to.equal(9);
+    expect(part2('D8005AC2A8F0'), 'part1: D8005AC2A8F0').to.equal(1);
+    expect(part2('F600BC2D8F'), 'part1: F600BC2D8F').to.equal(0);
+    expect(part2('9C005AC2F8F0'), 'part1: 9C005AC2F8F0').to.equal(0);
+    expect(part2('9C0141080250320F1802104A08'), 'part1: 9C0141080250320F1802104A08').to.equal(1);
+  });
+
   it('part2', () => {
-    expect(part2(readFile('input.txt')), 'part2: input.txt').to.equal(2899);
+    expect(part2(readFile('input.txt')), 'part2: input.txt').to.equal(1264857437203);
   });
 });
