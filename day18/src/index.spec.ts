@@ -51,6 +51,7 @@ describe('AoC 2021: day18', function () {
     expect(addition(['[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]]','[[[[4,2],2],6],[8,7]]'])).to.equal('[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]');
 
     expect(addition(readFile('input.training.txt'))).to.equal('[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]');
+
   });
 
   it('magnitude', () => {
@@ -69,7 +70,7 @@ describe('AoC 2021: day18', function () {
   });
 
   it('part2', () => {
-    expect(part2(readFile('input.example.txt')), 'part2: input.example.txt').to.equal(42);
-    expect(part2(readFile('input.txt')), 'part2: input.txt').to.equal(42);
+    expect(part2(readFile('input.example.txt')), 'part2: input.example.txt').to.equal(3993);
+    expect(part2(readFile('input.txt')), 'part2: input.txt').to.equal(4680);
   });
 });

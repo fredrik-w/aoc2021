@@ -9,7 +9,7 @@ export const explode = (pairs: string): string => {
     let start: number = index;
     let end: number = index;
     while (!chars.includes(pairs.charAt(--start)) && start > 0);
-    start > 1 && start++;
+    start > 0 && start++;
     while (!chars.includes(pairs.charAt(++end)) && end < pairs.length);
 
     let currentNumber = pairs.substring(start, end);
@@ -18,7 +18,7 @@ export const explode = (pairs: string): string => {
 
   let prevNumber = -1;
   let counter = 0;
-  for (let i=0; i<pairs.length; i++) {
+  for (let i = 0; i < pairs.length; i++) {
     if (pairs.charAt(i) === '[') {
       counter++;
     } else if (pairs.charAt(i) === ']') {
@@ -27,8 +27,8 @@ export const explode = (pairs: string): string => {
       prevNumber = i;
     }
     if (counter > 4) {
-      const explodingPair = pairs.substring(i+1, pairs.indexOf(']', i)).split(',');
-      let newPairs = pairs.substring(0, i) + '0' + pairs.substring(pairs.indexOf(']', i)+1);
+      const explodingPair = pairs.substring(i + 1, pairs.indexOf(']', i)).split(',');
+      let newPairs = pairs.substring(0, i) + '0' + pairs.substring(pairs.indexOf(']', i) + 1);
       while (++i < newPairs.length && chars.includes(newPairs.charAt(i)));
       i < newPairs.length && (newPairs = explodeNumber(newPairs, i, +explodingPair[1]));
       prevNumber !== -1 && (newPairs = explodeNumber(newPairs, prevNumber, +explodingPair[0]));
@@ -39,7 +39,7 @@ export const explode = (pairs: string): string => {
 }
 
 export const split = (pairs: string): string => {
-  const splitNumber = (number: number): string => `[${Math.floor(number/2)},${Math.ceil(number/2)}]`;
+  const splitNumber = (number: number): string => `[${Math.floor(number / 2)},${Math.ceil(number / 2)}]`;
   const numbers = [...pairs.matchAll(/\b\d{1,}\b/g)];
   for (const n of numbers) {
     if (+n[0] > 9) {
@@ -71,7 +71,7 @@ export const reduce = (pairs: string, pairs2: string): string => {
 
 export const magnitude = (pairs: string): number => {
   const calculateMagnitude = (pair: string): number => {
-    let numbers = pair.substring(1, pair.length-1).split(',').map(v => +v);
+    let numbers = pair.substring(1, pair.length - 1).split(',').map(v => +v);
     return (3 * numbers[0]) + (2 * numbers[1]);
   }
 
@@ -94,10 +94,18 @@ export const addition = (input: string[]): string => {
 
 export const part1 = (input: string[]): number => magnitude(addition(input));
 
-
-
 export const part2 = (input: string[]): number => {
-  return -1;
+  let highest = 0;
+  for (let i = 0; i < input.length; i++) {
+    for (let j=0; j<input.length; j++) {
+      if (j === i) {
+        continue;
+      }
+      let pair = Array.of(...input.slice(i, i+1), ...input.slice(j, j+1));
+      highest = Math.max(highest, magnitude(addition(pair)), magnitude(addition(pair.reverse())));
+    }
+  }
+  return highest;
 }
 
 require.main === module && console.log((process.env.part === 'part2' ? part2 : part1)(readFile('input.txt')));
