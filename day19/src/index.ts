@@ -49,9 +49,18 @@ type BeaconToBeacon = {
 }
 
 type CoordinateMap = {
-  x: 'x'|'y'|'z';
-  y: 'x'|'y'|'z';
-  z: 'x'|'y'|'z';
+  x: {
+    coordinate: 'x' | 'y' | 'z';
+    value: number;
+  },
+  y: {
+    coordinate: 'x' | 'y' | 'z';
+    value: number;
+  },
+  z: {
+    coordinate: 'x' | 'y' | 'z';
+    value: number;
+  }
 }
 
 type ScannerBeaconMapping = {
@@ -117,7 +126,6 @@ const commonBeacons = (a: Scanner, b: Scanner): Map<Beacon, Beacon> => {
     let match = b.distanceMap.filter(b2 => compare(b1, b2));
     if (match.length === 1) {
       const b2 = match.pop()!;
-// console.log('distanceMap', b1, b2);
       !beacons.has(b1.src) && beacons.set(b1.src, []);
       !beacons.has(b1.dst) && beacons.set(b1.dst, []);
       beacons.get(b1.src)!.push(b2.src, b2.dst);
@@ -138,10 +146,23 @@ const commonBeacons = (a: Scanner, b: Scanner): Map<Beacon, Beacon> => {
 
 const scannerBeaconCoordinatesMapping = (a: Scanner, b: Scanner, mapping: Map<Beacon, Beacon>): CoordinateMap => {
   const beaconMap: Beacon[][] = [...mapping.entries()];
-  const { x: ax, y: ay, z: az } = a.distanceMap.filter(b2b => (b2b.src.compareTo(beaconMap[0][0]) && b2b.dst.compareTo(beaconMap[1][0])) || (b2b.dst.compareTo(beaconMap[0][0]) && b2b.src.compareTo(beaconMap[1][0]))).pop()!;
-  const { x: bx, y: by, z: bz } = b.distanceMap.filter(b2b => (b2b.src.compareTo(beaconMap[0][1]) && b2b.dst.compareTo(beaconMap[1][1])) || (b2b.dst.compareTo(beaconMap[0][1]) && b2b.src.compareTo(beaconMap[1][1]))).pop()!;
+  const beaconA = a.distanceMap.filter(b2b => (b2b.src.compareTo(beaconMap[0][0]) && b2b.dst.compareTo(beaconMap[1][0])) || (b2b.dst.compareTo(beaconMap[0][0]) && b2b.src.compareTo(beaconMap[1][0]))).pop()!;
+  const beaconB = b.distanceMap.filter(b2b => (b2b.src.compareTo(beaconMap[0][1]) && b2b.dst.compareTo(beaconMap[1][1])) || (b2b.dst.compareTo(beaconMap[0][1]) && b2b.src.compareTo(beaconMap[1][1]))).pop()!;
 
-  return { x: ax === bx ? 'x' : ax === by ? 'y' : 'z', y: ay === by ? 'y' : ay === bx ? 'x' : 'z', z: az === bz ? 'z' : az === by ? 'y' : 'x' }
+  return {
+    x: {
+      coordinate: beaconA.x === beaconB.x ? 'x' : beaconA.x === beaconB.y ? 'y' : 'z',
+      value: beaconA.x === beaconB.x ? Math.abs(beaconA.src.x) - Math.abs(beaconB.src.x) : beaconA.x === beaconB.y ? Math.abs(beaconA.src.x) - Math.abs(beaconB.src.y) : Math.abs(beaconA.src.x) - Math.abs(beaconB.src.z),
+    },
+    y: {
+      coordinate: beaconA.y === beaconB.y ? 'y' : beaconA.y === beaconB.x ? 'x' : 'z',
+      value: beaconA.y === beaconB.y ? Math.abs(beaconA.src.y) - Math.abs(beaconB.src.y) : beaconA.y === beaconB.x ? Math.abs(beaconA.src.y) - Math.abs(beaconB.src.x) : Math.abs(beaconA.src.y) - Math.abs(beaconB.src.z),
+    },
+    z: {
+      coordinate: beaconA.z === beaconB.z ? 'z' : beaconA.z === beaconB.y ? 'y' : 'x',
+      value: beaconA.z === beaconB.z ? Math.abs(beaconA.src.z) - Math.abs(beaconB.src.z) : beaconA.z === beaconB.y ? Math.abs(beaconA.src.z) - Math.abs(beaconB.src.y) : Math.abs(beaconA.src.z) - Math.abs(beaconB.src.x),
+    },
+  }
 }
 
 const scannerMapping = (input: string[]): ScannerBeaconMapping[] => {
@@ -158,7 +179,7 @@ const scannerMapping = (input: string[]): ScannerBeaconMapping[] => {
 
 export const part1 = (input: string[]): number => {
   const map = scannerMapping(input);
-console.log(map);
+map.forEach(m => console.log(m.coordinateMap));
   return -1;
 }
 
