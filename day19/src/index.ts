@@ -31,12 +31,11 @@ class ComparableKeyMap<K extends Comparable<K>, V> extends Map<K, V> {
 
 class UniqueArray<T extends Comparable<T>> extends Array<T> {
   includes(searchElement: T, fromIndex?: number): boolean {
-
-    return super.includes(searchElement, fromIndex);
+    return super.slice(fromIndex || 0).filter(v => v.compareTo(searchElement)).length === 1;
   }
 
   push(...items: T[]): number {
-    return super.push(...items);
+    return super.push(...items.filter(v => !this.includes(v)));
   }
 }
 
@@ -177,10 +176,38 @@ const scannerMapping = (input: string[]): ScannerBeaconMapping[] => {
   return map;
 }
 
+const transformCoordinate = (beacon: Beacon, coordinateMap: CoordinateMap): Beacon => {
+  return new Beacon(
+    beacon[coordinateMap.x.coordinate] + coordinateMap.x.value,
+    beacon[coordinateMap.y.coordinate] + coordinateMap.y.value,
+    beacon[coordinateMap.z.coordinate] + coordinateMap.z.value
+  );
+}
+
 export const part1 = (input: string[]): number => {
+  const beaconMap: Array<Beacon> = new UniqueArray();
+  const processedScanners: string[] = [];
   const map = scannerMapping(input);
-map.forEach(m => console.log(m.coordinateMap));
-  return -1;
+  map.forEach(m => {
+    if (!processedScanners.includes(m.src.label)) {
+      if (processedScanners.length === 0) {
+        beaconMap.push(...m.src.beacons);
+      } else {
+        beaconMap.push(...m.src.beacons.map(b => transformCoordinate(b, m.coordinateMap)));
+      }
+      processedScanners.push(m.src.label);
+    }
+    if (!processedScanners.includes(m.dst.label)) {
+      beaconMap.push(...m.dst.beacons.map(b => transformCoordinate(b, m.coordinateMap)));
+      processedScanners.push(m.dst.label);
+    }
+  });
+
+beaconMap
+  .sort((a, b) => a.x > b.x ? 1 : a.x < b.x ? -1 : 0)
+  .forEach(b => console.log(`${b.x},${b.y},${b.z}`));
+
+  return beaconMap.length;
 }
 
 export const part2 = (input: string[]): number => {
