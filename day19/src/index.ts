@@ -1,5 +1,4 @@
 import fs from 'fs';
-import {Key} from 'readline';
 
 export const readFile = (filename: string) => fs.readFileSync(filename).toString().split('\n');
 
@@ -12,7 +11,7 @@ class ComparableKeyMap<K extends Comparable<K>, V> extends Map<K, V> {
 
   delete(key: K): boolean {
     const k = this.findKey(key);
-    return k === undefined ? false : super.delete(k);
+    return k !== undefined ? super.delete(k) : false;
   }
 
   get(key: K): V | undefined {
@@ -22,11 +21,22 @@ class ComparableKeyMap<K extends Comparable<K>, V> extends Map<K, V> {
 
   has(key: K): boolean {
     const k = this.findKey(key);
-    return k === undefined ? false : super.has(k);
+    return k !== undefined ? super.has(k) : false;
   }
 
   set(key: K, value: V): this {
     return super.set(this.findKey(key) || key, value);
+  }
+}
+
+class UniqueArray<T extends Comparable<T>> extends Array<T> {
+  includes(searchElement: T, fromIndex?: number): boolean {
+
+    return super.includes(searchElement, fromIndex);
+  }
+
+  push(...items: T[]): number {
+    return super.push(...items);
   }
 }
 
@@ -38,10 +48,17 @@ type BeaconToBeacon = {
   z: number;
 }
 
+type CoordinateMap = {
+  x: 'x'|'y'|'z';
+  y: 'x'|'y'|'z';
+  z: 'x'|'y'|'z';
+}
+
 type ScannerBeaconMapping = {
   src: Scanner,
   dst: Scanner,
   mapping: Map<Beacon, Beacon>
+  coordinateMap: CoordinateMap
 }
 
 class Beacon implements Comparable<Beacon> {
@@ -92,17 +109,15 @@ const parse = (input: string[]): Scanner[] => {
 }
 
 const commonBeacons = (a: Scanner, b: Scanner): Map<Beacon, Beacon> => {
-  // const compare = (a: BeaconToBeacon, b: BeaconToBeacon): boolean => a.x === b.x && a.y === b.y && a.z === b.z;
-  // const compare = (a: BeaconToBeacon, b: BeaconToBeacon): boolean => [a.x, a.y, a.z].every(v => [b.x, b.y, b.z].includes(v));
   const compare = (a: BeaconToBeacon, b: BeaconToBeacon): boolean => (a.x * a.y * a.z) === (b.x * b.y * b.z);
 
   const beacons: Map<Beacon, Beacon[]> = new ComparableKeyMap();
-  const scannerBeaconMapping: Map<Beacon, Beacon> = new Map();
 
   a.distanceMap.forEach(b1 => {
     let match = b.distanceMap.filter(b2 => compare(b1, b2));
     if (match.length === 1) {
-      const b2= match.pop()!;
+      const b2 = match.pop()!;
+// console.log('distanceMap', b1, b2);
       !beacons.has(b1.src) && beacons.set(b1.src, []);
       !beacons.has(b1.dst) && beacons.set(b1.dst, []);
       beacons.get(b1.src)!.push(b2.src, b2.dst);
@@ -110,30 +125,40 @@ const commonBeacons = (a: Scanner, b: Scanner): Map<Beacon, Beacon> => {
     }
   });
 
+  const scannerBeaconMapping: Map<Beacon, Beacon> = new Map();
   for (const [beaconA, candidates] of beacons.entries()) {
-    let occurances: Map<Beacon, number> = new ComparableKeyMap();
-    candidates.forEach(b => {
-      !occurances.has(b) && occurances.set(b, 0);
-      occurances.set(b, occurances.get(b)!+1);
-    });
-    const match = Math.max(...occurances.values());
-    const beaconB = [...occurances.entries()].filter(([b, count]) => count === match).map(([b, count]) => b).pop()!;
+    let occurrences: Map<Beacon, number> = new ComparableKeyMap();
+    candidates.forEach(b => occurrences.set(b, (occurrences.get(b) || 0 ) + 1));
+    const beaconB = [...occurrences.entries()].filter(([b, count]) => count === Math.max(...occurrences.values())).map(([b, count]) => b).pop()!;
     scannerBeaconMapping.set(beaconA, beaconB);
   }
 
   return scannerBeaconMapping;
 }
 
-export const part1 = (input: string[]): number => {
+const scannerBeaconCoordinatesMapping = (a: Scanner, b: Scanner, mapping: Map<Beacon, Beacon>): CoordinateMap => {
+  const beaconMap: Beacon[][] = [...mapping.entries()];
+  const { x: ax, y: ay, z: az } = a.distanceMap.filter(b2b => (b2b.src.compareTo(beaconMap[0][0]) && b2b.dst.compareTo(beaconMap[1][0])) || (b2b.dst.compareTo(beaconMap[0][0]) && b2b.src.compareTo(beaconMap[1][0]))).pop()!;
+  const { x: bx, y: by, z: bz } = b.distanceMap.filter(b2b => (b2b.src.compareTo(beaconMap[0][1]) && b2b.dst.compareTo(beaconMap[1][1])) || (b2b.dst.compareTo(beaconMap[0][1]) && b2b.src.compareTo(beaconMap[1][1]))).pop()!;
+
+  return { x: ax === bx ? 'x' : ax === by ? 'y' : 'z', y: ay === by ? 'y' : ay === bx ? 'x' : 'z', z: az === bz ? 'z' : az === by ? 'y' : 'x' }
+}
+
+const scannerMapping = (input: string[]): ScannerBeaconMapping[] => {
   const scanners = parse(input);
-  const scannerMapping: ScannerBeaconMapping[] = [];
+  const map: ScannerBeaconMapping[] = [];
   for (let i=0; i<scanners.length; i++) {
     for (let j=i+1; j<scanners.length; j++) {
       const mapping = commonBeacons(scanners[i], scanners[j]);
-      mapping.size >= 12 && scannerMapping.push({src: scanners[i], dst: scanners[j], mapping});
+      mapping.size >= 12 && map.push({src: scanners[i], dst: scanners[j], mapping, coordinateMap: scannerBeaconCoordinatesMapping(scanners[i], scanners[j], mapping)});
     }
   }
-console.log(scannerMapping);
+  return map;
+}
+
+export const part1 = (input: string[]): number => {
+  const map = scannerMapping(input);
+console.log(map);
   return -1;
 }
 

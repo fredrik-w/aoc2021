@@ -98,11 +98,10 @@ export const part2 = (input: string[]): number => {
   let highest = 0;
   for (let i = 0; i < input.length; i++) {
     for (let j=0; j<input.length; j++) {
-      if (j === i) {
-        continue;
+      if (j !== i) {
+        let pair = Array.of(...input.slice(i, i+1), ...input.slice(j, j+1));
+        highest = Math.max(highest, magnitude(addition(pair)), magnitude(addition(pair.reverse())));
       }
-      let pair = Array.of(...input.slice(i, i+1), ...input.slice(j, j+1));
-      highest = Math.max(highest, magnitude(addition(pair)), magnitude(addition(pair.reverse())));
     }
   }
   return highest;
